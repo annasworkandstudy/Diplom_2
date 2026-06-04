@@ -11,3 +11,20 @@ def user_cleanup():
     yield body
     if token:
         UserMethods.delete_user(headers)
+
+@pytest.fixture
+def auth_headers():
+    body = GenerateData.generate_user_login_password()
+    UserMethods.create_user(body)
+    
+    login_response = UserMethods.enter_user(body)
+    token = login_response.json().get("accessToken")
+    
+    return {"Authorization": token} if token else {}
+
+@pytest.fixture
+def user_auth_headers(self, user_cleanup):
+    body = user_cleanup
+    login_response = UserMethods.enter_user(body)
+    token = login_response.json().get("accessToken")
+    return {"Authorization": token} if token else {}
